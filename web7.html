@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>滚动</title>
+  <style>
+    *{
+      margin: 0px;
+      padding: 0px;
+    }
+    ul,li{
+      list-style: none;
+    }
+    #welt{
+      width: 100%;
+      height: 30px;
+      background-color: #CCC;
+      display: inline-block;
+      float: left;
+      overflow: hidden;
+    }
+    #left{
+      margin-top: 5px;
+      height: 20px;
+      width: 30px;
+      margin-left: 120px;
+      float: left;
+    }
+    #right{
+      margin-top: 5px;
+      height: 20px;
+      width: 920px;
+      position: absolute;
+      float: left;
+      left: 170px;
+      overflow: hidden;
+    }
+    #text{
+      width: 480px;
+      height: 20px;
+      position: absolute;
+      float: left;
+      left: 1080px;
+      color: red;
+    }
+    .box{
+      width: 1200px;
+      height: 397px;
+      margin: 50px auto;
+      position: relative;
+      top: 15px;
+      overflow: hidden;
+    }
+    .slider{
+      width:8400px;
+      position: absolute;
+      left: -1200px;
+      float: left;
+    }
+    .slide{
+      width: 1200px;
+      overflow: hidden;
+      float: left;
+    }
+    .box>span{
+    display: block;
+    width: 30px;
+    height: 50px;
+    text-align: center;
+    cursor: pointer;
+    top: 175px;
+    line-height: 50px;
+    background-color: rgb(255,0,0);
+    font-size: 30px;
+    position: absolute;
+    opacity: 0;
+    }
+    #toLeft{
+      left: 30px;
+    }
+    #toRight{
+      right: 30px;
+    }
+    .nav{
+      position: absolute;
+      left: 500px;
+      bottom: 20px;
+    }
+    .nav>ul{
+      text-align: center; 
+      display:inline-block;
+    }
+    .nav>li{
+      float: left;
+      width: 20px;
+      height: 20px;
+      background-color: #ccc;
+      cursor: pointer;
+      display: inline;
+      text-align: center;
+      margin: 0 10px;
+      border-radius: 50%;
+    }
+    .nav>.active{
+      background-color:red;
+    }
+  </style>
+  <script src="js/animate.js"></script>
+</head>
+
+<body>
+  <div id="welt">
+    <div id="left"><img src="images/a15.png"/></div>
+    <div id="right">
+      <div id="text">[温馨提示]最近有不少不法分子在网上骗人，请大家注意！！！</div>
+    </div>
+  </div>
+  <div id="box" class="box">
+    <div id="slider" class="slider">
+      <div class="slide"><img src="images/b5.png" alt=""></div>
+      <div class="slide"><img src="images/b1.png" alt=""></div>
+      <div class="slide"><img src="images/b2.png" alt=""></div>
+      <div class="slide"><img src="images/b3.png" alt=""></div>
+      <div class="slide"><img src="images/b4.png" alt=""></div>
+      <div class="slide"><img src="images/b5.png" alt=""></div>
+      <div class="slide"><img src="images/b1.png" alt=""></div>
+    </div>
+    <span id="toLeft"> < </span>
+    <span id="toRight"> > </span>
+    <ul class="nav" id="nav">
+      <li class="active">1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+    </ul>
+    </div>
+</body>
+<script>
+    var welt=document.getElementById("welt");
+    var left=document.getElementById("left");
+    var right=document.getElementById("right");
+    var text=document.getElementById("text");
+    var intervalId;
+    //滚动字幕
+    window.onload=function(){
+        intervalId=setInterval(function(){
+          var obj=getComputedStyle(text);
+          var l=obj["left"];
+          text.style.left=(parseInt(l)-1)+"px";
+          if(parseInt(l)<-450){
+            text.style.left="1080px";
+          }
+        }, 10);
+     } 
+
+    var slider=document.getElementById("slider");
+    var toLeft=document.getElementById("toLeft");
+    var toRight=document.getElementById("toRight");
+    var box=document.getElementById("box");
+    var oNavlist=document.getElementById("nav").children;
+    var timer;
+    var index=1;
+    var isMoving=false;
+    //轮播函数
+    function next(){
+      if(!isMoving){
+        isMoving=true;
+        index++;
+        navChange();
+        animate(slider,{left:-1200*index},function(){
+          if(index===6){
+            slider.style.left="-1200px";
+            index=1;
+          }
+          isMoving=false;
+        });
+      }
+    }
+    //向前
+    function prev(){
+      if(!isMoving){
+        return;
+      }
+      isMoving=true;
+      index--;
+      navChange();
+      animate(slider,{left:-1200*index},function(){
+        if(index===0){
+          slider.style.left="-6000px";
+          index=5;
+        }
+        isMoving=false;
+      });
+    }
+    timer=setInterval(next,3000);
+    //鼠标划入 箭头显示 清定时器
+    box.onmouseover=function(){
+      animate(toLeft,{opacity:50});
+      animate(toRight,{opacity:50});
+      clearInterval(timer);
+    }
+    //鼠标划出继续
+    box.onmouseout=function(){
+      animate(toLeft,{opacity:0});
+      animate(toRight,{opacity:0});
+      timer=setInterval(next,3000);
+    }
+    //箭头函数
+    toRight.onclick=next;
+    toLeft.onclick=prev;
+    //按钮点击切换
+    for(var i=0;i<oNavlist.length;i++){
+      oNavlist[i].idx=i;
+      oNavlist[i].onclick=function(){
+        index=this.idx+1;
+        navChange();
+        animate(slider,{left:-1200*index});
+      }
+    }
+    //按钮变红
+    function navChange(){
+      for(var i=0;i<oNavlist.length;i++){
+        oNavlist[i].className="";
+      }
+      if(index==6){
+        oNavlist[0].className='active';
+      }
+      else if(index==0){
+        oNavlist[4].className='active';
+      }
+      else{
+        oNavlist[index-1].className='active';
+      } 
+    } 
+</script>
+</html>
